@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------
-# TODO:
-# [ ] add support to delete particular posts
-# ------------------------------------------------------------------------
 
 usage() {
    echo "usage:"
@@ -39,6 +36,18 @@ init() {
    echo "done."
 }
 
+new() {
+   printf 'POST TITLE: '
+   read -r title
+   post_title=$title
+   title=`echo $title | sed "s/ /-/g"`
+   date=`date '+%Y%m%d'`
+   filename="$title""_""$date"
+   header="# @[❮](../../index.html) ""$post_title"
+   echo $header > ./aelobdog-writes/posts/$filename
+   vi ./aelobdog-writes/posts/$filename
+}
+
 make() {
    if [ ! -d "$1" ]; then
       echo "ERROR : directory '$1' does not exist."
@@ -52,7 +61,7 @@ make() {
       
       # compile sitefl files to html using default templates
       # store html files in "composts" directory inside blog
-      ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ../../sitefl/defaults/templateCSS.css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post to html."
+      ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ../../sitefl/defaults/templateCSS.css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
    done
 
    # write blog's name to index (sitefl)
@@ -70,10 +79,10 @@ make() {
       title=`echo "$filename" | cut -d "_" -f1 | sed "s/-/ /g"`
       # write all links to (sitefl) index file
       echo "### @[$title]($name/composts/$i)\n" >> $1/index && echo "LOG : added [ $title ] to index (sitefl)"
-      # generate index.html
-      ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ./sitefl/defaults/templateCSS.css $name/index index.html && echo "LOG : index.html created."
    done
-
+   
+   # generate index.html
+   ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ./sitefl/defaults/templateCSS.css $name/index index.html && echo "LOG : index.html created."
    echo "done."
 }
 
@@ -81,6 +90,8 @@ if [ "$1" = "init" ]; then
    init $2
 elif [ "$1" = "make" ]; then
    make $2
+elif [ "$1" = "new" ]; then
+   new
 else
    usage
 fi
