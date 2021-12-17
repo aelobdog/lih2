@@ -61,7 +61,20 @@ make() {
       
       # compile sitefl files to html using default templates
       # store html files in "composts" directory inside blog
-      ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ../../sitefl/defaults/templateCSS.css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
+
+      # lih will use the template files in the `template` directory by default,
+      # but will fall back on the default sitefl templates if templates dir is 
+      # empty.
+      css='../../sitefl/defaults/templateCSS.css'
+      html='./sitefl/defaults/html.html'
+
+      if [ -f './templates/css.css' ]; then
+         css='./templates/css.css'
+      fi
+      if [ -f './templates/html.html' ]; then
+         html='./templates/html.html'
+      fi
+      ./sitefl/sitefl -nts html css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
    done
 
    # write blog's name to index (sitefl)
