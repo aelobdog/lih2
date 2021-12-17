@@ -33,6 +33,7 @@ init() {
    mkdir posts
    mkdir composts
    cd ..
+   mkdir templates
    echo "done."
 }
 
@@ -65,16 +66,20 @@ make() {
       # lih will use the template files in the `template` directory by default,
       # but will fall back on the default sitefl templates if templates dir is 
       # empty.
-      css='../../sitefl/defaults/templateCSS.css'
-      html='./sitefl/defaults/html.html'
 
       if [ -f './templates/css.css' ]; then
-         css='./templates/css.css'
+         css='../../templates/css.css'
+      else
+         css='../../sitefl/defaults/templateCSS.css'
       fi
+
       if [ -f './templates/html.html' ]; then
          html='./templates/html.html'
+      else
+         html='./sitefl/defaults/templateHTML.html'
       fi
-      ./sitefl/sitefl -nts html css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
+
+      ./sitefl/sitefl -nts $html $css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
    done
 
    # write blog's name to index (sitefl)
