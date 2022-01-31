@@ -60,11 +60,11 @@ make() {
       echo "ERROR : directory '$1' does not exist."
       exit 1
    fi
-   
+
    for file in $( ls $1/posts/ )
    do
       # extract date (and id if there is more than one post on the same day)
-      dateID=`echo $file | cut -d "_" -f2`
+      dateID=`echo $file | cut -d "_" -f2 | cut -d "." -f1`
       
       # compile sitefl files to html using default templates
       # store html files in "composts" directory inside blog
@@ -89,7 +89,7 @@ make() {
 
    # write blog's name to index (sitefl)
    name=`echo $1 | sed "s/\///g"`
-   echo "# $name\n" > $1/index
+   echo "## $name\n" > $1/index
 
    # iterate over posts (latest first)
    for i in $( ls -r $1/composts )
@@ -100,12 +100,25 @@ make() {
       filename=`ls $1/posts/ | grep "$dateID"`
       # extract the title from that post
       title=`echo "$filename" | cut -d "_" -f1 | sed "s/-/ /g"`
+      date_fmt=`echo $dateID | sed -n -e "s_\(....\)\(..\)\(..\)_\3-\2-\1_p"`
       # write all links to (sitefl) index file
-      echo "### @[$title]($name/composts/$i)\n" >> $1/index && echo "LOG : added [ $title ] to index (sitefl)"
+      echo "#### $date_fmt &nbsp &nbsp @[$title]($name/composts/$i)" >> $1/index && echo "LOG : added [ $title ] to index (sitefl)"
    done
    
+   if [ -f './templates/css.css' ]; then
+      css='templates/css.css'
+   else
+      css='sitefl/defaults/templateCSS.css'
+   fi
+
+   if [ -f './templates/html.html' ]; then
+      html='templates/html.html'
+   else
+      html='sitefl/defaults/templateHTML.html'
+   fi
+
    # generate index.html
-   ./sitefl/sitefl -nts ./sitefl/defaults/templateHTML.html ./sitefl/defaults/templateCSS.css $name/index index.html && echo "LOG : index.html created."
+   ./sitefl/sitefl -nts $html $css $name/index index.html && echo "LOG : index.html created."
    echo "done."
 }
 
