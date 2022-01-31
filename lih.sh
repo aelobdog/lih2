@@ -16,12 +16,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------
 
+# TODO: explore the option of modifying the lih script on the first run
+#       to add a delclaration with the blog name. This will make cause
+#       problems in name changing but all that can be automated so that
+#       is not that big of a problem.
+
 usage() {
    echo "usage:"
-   echo "sh lih.sh command"
+   echo "./lih.sh <command>"
    echo "\ncommands:"
    echo "   init [name]    creates the directory structure"
-   echo "   make           compiles blog"
+   echo "   new  [name]    create a new post"
+   echo "   make [name]    compile the blog"
 }
 
 init() {
@@ -45,8 +51,8 @@ new() {
    date=`date '+%Y%m%d'`
    filename="$title""_""$date"
    header="# @[❮](../../index.html) ""$post_title"
-   echo $header > ./aelobdog-writes/posts/$filename
-   vi ./aelobdog-writes/posts/$filename
+   echo $header > ./$1/posts/$filename
+   $EDITOR ./$1/posts/$filename
 }
 
 make() {
@@ -108,7 +114,7 @@ if [ "$1" = "init" ]; then
 elif [ "$1" = "make" ]; then
    make $2
 elif [ "$1" = "new" ]; then
-   new
+   new $2
 else
    usage
 fi
