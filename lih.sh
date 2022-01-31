@@ -62,10 +62,9 @@ make() {
       
       # compile sitefl files to html using default templates
       # store html files in "composts" directory inside blog
-
-      # lih will use the template files in the `template` directory by default,
-      # but will fall back on the default sitefl templates if templates dir is 
-      # empty.
+      # lih will use the template files in the `template`
+      # directory by default, but will fall back on the default
+      # sitefl templates if templates dir is empty.
 
       if [ -f './templates/css.css' ]; then
          css='../../templates/css.css'
