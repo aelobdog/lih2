@@ -25,18 +25,17 @@ usage() {
    echo "usage:"
    echo "./lih.sh <command>"
    echo "\ncommands:"
-   echo "   init [blog-name]    creates the directory structure"
-   echo "   new  [blog-name]    create a new post"
-   echo "   make [blog-name]    compile the blog"
+   echo "   init [name]    creates the directory structure"
+   echo "   new  [name]    create a new post"
+   echo "   make [name]    compile the blog"
 }
 
 init() {
-   name=`pwd | awk -F "/" '{print $NF}'`
-   if [ -d "$name" ]; then
-      echo "ERROR : directory '$name' already exists."
+   if [ -d "$1" ]; then
+      echo "ERROR : directory '$1' already exists."
       exit 1
    fi
-   mkdir $name && cd $name
+   mkdir $1 && cd $1
    mkdir posts
    mkdir composts
    cd ..
@@ -45,28 +44,24 @@ init() {
 }
 
 new() {
-   name=`pwd | awk -F "/" '{print $NF}'`
    printf 'POST TITLE: '
    read -r title
    post_title=$title
    title=`echo $title | sed "s/ /-/g"`
    date=`date '+%Y%m%d'`
-   indate=`date '+%d-%m-%Y'`
    filename="$title""_""$date"
    header="# @[❮](../../index.html) ""$post_title"
-   echo $header > ./$name/posts/$filename
-   echo "#### ""$indate" >> ./$name/posts/$filename
-   nvim ./$name/posts/$filename
+   echo $header > ./$1/posts/$filename
+   $EDITOR ./$1/posts/$filename
 }
 
 make() {
-   bname=`pwd | awk -F "/" '{print $NF}'`
-   if [ ! -d "$bname" ]; then
-      echo "ERROR : directory '$bname' does not exist."
+   if [ ! -d "$1" ]; then
+      echo "ERROR : directory '$1' does not exist."
       exit 1
    fi
 
-   for file in $( ls $bname/posts/ )
+   for file in $( ls $1/posts/ )
    do
       # extract date (and id if there is more than one post on the same day)
       dateID=`echo $file | cut -d "_" -f2 | cut -d "." -f1`
@@ -89,25 +84,25 @@ make() {
          html='./sitefl/defaults/templateHTML.html'
       fi
 
-      ./sitefl/sitefl -nts $html $css $bname/posts/$file $bname/composts/$dateID.html && echo "LOG : compiled post $file to html."
+      ./sitefl/sitefl -nts $html $css $1/posts/$file $1/composts/$dateID.html && echo "LOG : compiled post $file to html."
    done
 
    # write blog's name to index (sitefl)
-   name=`echo $bname | sed "s/\///g"`
-   echo "## $name" > $bname/index
+   name=`echo $1 | sed "s/\///g"`
+   echo "## $name\n" > $1/index
 
    # iterate over posts (latest first)
-   for i in $( ls -r $bname/composts )
+   for i in $( ls -r $1/composts )
    do
       # extract dateID from compiled file's name
       dateID=`echo $i | sed "s/.html//g"`
       # find the file with the same dateID in the posts directory
-      filename=`ls $bname/posts/ | grep "$dateID"`
+      filename=`ls $1/posts/ | grep "$dateID"`
       # extract the title from that post
       title=`echo "$filename" | cut -d "_" -f1 | sed "s/-/ /g"`
       date_fmt=`echo $dateID | sed -n -e "s_\(....\)\(..\)\(..\)_\3-\2-\1_p"`
       # write all links to (sitefl) index file
-      echo "#### $date_fmt &nbsp &nbsp @[$title]($name/composts/$i)" >> $bname/index
+      echo "#### $date_fmt &nbsp &nbsp @[$title]($name/composts/$i)" >> $1/index && echo "LOG : added [ $title ] to index (sitefl)"
    done
    
    if [ -f './templates/css.css' ]; then
