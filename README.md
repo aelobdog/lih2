@@ -1,10 +1,6 @@
 # lih2
 lih2 is a simple blog creation and maintanance tool
 
-#### _DISCLAIMER_ : This is experimental software.
-####                There are bugs.
-####                You have been warned. (xP)
-
 ## Setting up
 Before you can make your blog, you need to get the necessary tools
 ```bash
@@ -14,12 +10,8 @@ $ mkdir blog_cover
 $ # change directories into the one you just created
 $ cd blog_cover
 
-$ # download lih.sh into the directory
-$ git clone https://github.com/aelobdog/lih2
-
-$ # extract the files from the downloaded directory
-$ mv lih2/lih.sh ./; mv lih2/sitefl/ ./; mv lih2/templates/ ./;
-$ rm -rf lih2/
+$ # download lih.sh into the directory make it executable
+$ wget https://raw.githubusercontent.com/aelobdog/lih2/master/lih.sh && chmod +x lih.sh
 ```
 
 ## Making a new blog
@@ -33,7 +25,7 @@ Writing a post is simple as well!
 ```bash
 $ ./lih.sh new my_blog_name
 POST TITLE: My first post
-<edit the file opened in nvim>
+<this tries to open up vim, if you dont have it you can manually open the file in your editor of choice>
 ```
 
 ## Generating the blog

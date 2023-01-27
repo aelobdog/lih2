@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------
 
-# TODO: explore the option of modifying the lih script on the first run
-#       to add a delclaration with the blog name. This will make cause
-#       problems in name changing but all that can be automated so that
-#       is not that big of a problem.
-
 usage() {
    echo "usage:"
    echo "./lih.sh <command>"
@@ -40,7 +35,6 @@ init() {
    mkdir posts
    mkdir composts
    cd ..
-   mkdir templates
    echo "done."
 }
 
@@ -50,13 +44,14 @@ new() {
    read -r title
    post_title=$title
    title=`echo $title | sed "s/ /-/g"`
-   date=`date '+%Y%m%d'`
+   date=`date '+%M%H%Y%m%d'`
    indate=`date '+%d-%m-%Y'`
    filename="$title""_""$date"
-   header="# @[❮](../../index.html) ""$post_title"
+   header="#1 $post_title"
    echo $header > ./$name/posts/$filename
-   echo "#### ""$indate" >> ./$name/posts/$filename
-   nvim ./$name/posts/$filename
+   echo "#4 ""$indate" >> ./$name/posts/$filename
+   echo "@[home](../../index.html)" >> ./$name/posts/$filename
+   vim ./$name/posts/$filename
 }
 
 make() {
@@ -70,31 +65,20 @@ make() {
    do
       # extract date (and id if there is more than one post on the same day)
       dateID=`echo $file | cut -d "_" -f2 | cut -d "." -f1`
-      
-      # compile sitefl files to html using default templates
+      filename=`ls $bname/posts/ | grep "$dateID"`
+      title=`echo "$filename" | cut -d "_" -f1 | sed "s/-/ /g"`
+
+      # compile wrang files to html using default templates
       # store html files in "composts" directory inside blog
-      # lih will use the template files in the `template`
-      # directory by default, but will fall back on the default
-      # sitefl templates if templates dir is empty.
-
-      if [ -f './templates/css.css' ]; then
-         css='../../templates/css.css'
-      else
-         css='../../sitefl/defaults/templateCSS.css'
-      fi
-
-      if [ -f './templates/html.html' ]; then
-         html='./templates/html.html'
-      else
-         html='./sitefl/defaults/templateHTML.html'
-      fi
-
-      ./sitefl/sitefl -nts $html $css $bname/posts/$file $bname/composts/$dateID.html && echo "LOG : compiled post $file to html."
+      wrang $bname/posts/$file $bname/composts/$dateID.html -title $title -css "../../stylesheet.css"
    done
 
-   # write blog's name to index (sitefl)
+   # write blog's name to index
    name=`echo $bname | sed "s/\///g"`
-   echo "## $name" > $bname/index
+   echo "#1 $name" > $bname/index
+   echo "" >> $bname/index
+   echo "![mascot:mascot](./mascot.png)" >> $bname/index
+   echo "" >> $bname/index
 
    # iterate over posts (latest first)
    for i in $( ls -r $bname/composts )
@@ -106,25 +90,14 @@ make() {
       # extract the title from that post
       title=`echo "$filename" | cut -d "_" -f1 | sed "s/-/ /g"`
       date_fmt=`echo $dateID | sed -n -e "s_\(....\)\(..\)\(..\)_\3-\2-\1_p"`
-      # write all links to (sitefl) index file
-      echo "#### $date_fmt &nbsp &nbsp @[$title]($name/composts/$i)" >> $bname/index
-   done
-   
-   if [ -f './templates/css.css' ]; then
-      css='templates/css.css'
-   else
-      css='sitefl/defaults/templateCSS.css'
-   fi
 
-   if [ -f './templates/html.html' ]; then
-      html='templates/html.html'
-   else
-      html='sitefl/defaults/templateHTML.html'
-   fi
+      # write all links to index file
+      echo "#4 $date_fmt &nbsp &nbsp @[$title](./$name/composts/$i)" >> $bname/index
+   done
 
    # generate index.html
-   ./sitefl/sitefl -nts $html $css $name/index index.html && echo "LOG : index.html created."
-   echo "done."
+   wrang $name/index index.html -css "./stylesheet.css" -title $name
+   echo "generated site."
 }
 
 if [ "$1" = "init" ]; then

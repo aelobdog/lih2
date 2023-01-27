@@ -1,0 +1,13 @@
+#1 Lih2
+
+
+![mascot:mascot](./lih2_mascot.png)
+
+
+Lih2 is a bash script that I use to maintain my personal blog. It uses wrang to convert posts in markup to html.
+
+Lih2 doesn't need any /setup/.
+
+I'm really tired of having to set up stuff that should just work out of the box (or with some simple compilation step). Of course lih2 isn't portable, after all it is just a shell script. But since it is mainly for personal use, I don't really need a windows compatible version. Maybe when I need one, I'll get the script translated to python using chatGPT.
+
+If interested in using the tool, visit the github link @[here](https://github.com/aelobdog/lih2) and go through the readme.
